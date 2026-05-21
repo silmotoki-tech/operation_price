@@ -2,6 +2,12 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="手術概算">
+  <meta name="theme-color" content="#2E6B1F">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <title>手術費用 概算ツール | にゅうた動物病院</title>
   <style>
@@ -736,6 +742,13 @@ document.addEventListener('DOMContentLoaded',function(){
 
   update();
 });
+</script>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('./sw.js');
+  });
+}
 </script>
 </body>
 </html>
