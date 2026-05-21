@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>手術費用 概算ツール | にゅうた動物病院</title>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+    body{font-family:system-ui,-apple-system,sans-serif;background:#f3f4f6;padding:1.25rem 0 3rem;color:#111827;font-size:14px;line-height:1.5}
+    .wrap{max-width:900px;margin:0 auto;padding:0 1.25rem}
+    h1{font-size:18px;font-weight:500;margin-bottom:1.25rem;color:#111827}
+
+    /* 2カラムグリッド（iPad以上） */
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+    .col-left{display:flex;flex-direction:column;gap:16px}
+    .col-right{display:flex;flex-direction:column;gap:16px}
+    .full{grid-column:1/-1}
+
+    /* スマホは1カラム */
+    @media(max-width:640px){
+      .grid{grid-template-columns:1fr}
+      .col-right{order:2}
+    }
+
+    .card{background:#fff;border:.5px solid #e5e7eb;border-radius:10px;overflow:hidden}
+    .ch{padding:10px 16px;background:#2E6B1F;border-bottom:none;font-size:13px;font-weight:600;color:#fff;letter-spacing:.03em}
+    .cb{padding:14px 16px}
+
+    .tg{display:flex;gap:8px;margin-bottom:14px}
+    .tb{flex:1;padding:11px 0;font-size:14px;font-weight:400;background:#f7f7f5;color:#6b7280;border:.5px solid #e5e7eb;border-radius:6px;cursor:pointer;font-family:inherit}
+    .tb.on{font-weight:600;background:#5c3d1e;color:#fff;border-color:#5c3d1e}
+
+    label.field{display:block;font-size:12px;color:#6b7280;margin-bottom:4px}
+    input[type=number],input[type=text]{border:1px solid #e5e7eb;border-radius:6px;padding:7px 9px;outline:none;background:#fff;font-family:inherit;color:#111827;font-size:16px}
+    input[type=number]:focus,input[type=text]:focus{border-color:#2E6B1F}
+    input:disabled{background:#f9fafb;cursor:not-allowed}
+    input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none}
+    input[type=number]{-moz-appearance:textfield}
+    input[type=checkbox]{accent-color:#2E6B1F;width:18px;height:18px;cursor:pointer;flex-shrink:0}
+
+    .checks{display:flex;gap:20px}
+    .ck{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;user-select:none;padding:4px 0}
+
+    .row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:.5px solid #e5e7eb}
+    .row.last{border-bottom:none}
+    .rl{font-size:13px;flex:1}
+    .rp{font-size:13px;font-variant-numeric:tabular-nums;min-width:68px;text-align:right;color:#9ca3af;white-space:nowrap}
+    .rp.on{color:#111827}
+    .tag{font-size:10px;font-weight:500;border-radius:3px;padding:1px 5px;margin-left:5px;color:#2E6B1F;background:#F0F7ED}
+
+    .bsub{display:flex;align-items:center;gap:8px;padding:6px 0 6px 26px;border-bottom:.5px solid #e5e7eb;background:#f7f7f5}
+
+    .cr{display:flex;align-items:center;gap:10px;padding:8px 0}
+    .cbtn{width:36px;height:36px;border-radius:50%;border:.5px solid #e5e7eb;background:#f7f7f5;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:inherit}
+    .cbtn:hover{background:#e5e7eb}
+    .cv{font-size:15px;font-weight:500;min-width:22px;text-align:center}
+    .cu{font-size:12px;color:#6b7280}
+    .cp{font-size:13px;font-variant-numeric:tabular-nums;min-width:72px;text-align:right;font-weight:500}
+
+    .pr{display:flex;align-items:center;gap:10px;padding:8px 0}
+    .prl{font-size:13px;flex:1}
+    .pri{display:flex;align-items:center;gap:6px}
+    .yen{font-size:13px;color:#6b7280}
+
+    .div{border-top:.5px solid #e5e7eb;margin-top:4px;padding-top:10px}
+    .divs{border-top:.5px solid #e5e7eb;margin-top:8px;padding-top:10px}
+    .mb14{margin-bottom:14px}
+
+    .or{display:flex;gap:8px;align-items:center;margin-top:8px}
+    .or input[type=text]{flex:1}
+
+    /* 内訳 */
+    .bc{padding:5px 16px 2px;font-size:11px;color:#9ca3af;background:#f7f7f5;border-bottom:.5px solid #e5e7eb}
+    .br{display:flex;justify-content:space-between;padding:8px 16px;border-bottom:.5px solid #e5e7eb;font-size:13px}
+    .brnm{color:#6b7280}
+    .bram{font-variant-numeric:tabular-nums}
+    .be{padding:24px 16px;text-align:center;font-size:13px;color:#9ca3af}
+
+    /* 合計 */
+    .ta{padding:14px 16px;background:#f7f7f5}
+    .ts{display:flex;justify-content:space-between;font-size:13px;color:#6b7280;margin-bottom:6px}
+    .ts span:last-child{font-variant-numeric:tabular-nums}
+    .tm{display:flex;justify-content:space-between;align-items:baseline;border-top:.5px solid #d1d5db;padding-top:12px;margin-top:6px}
+    .tl{font-size:15px;font-weight:500}
+    .tv{font-size:30px;font-weight:600;color:#2E6B1F;font-variant-numeric:tabular-nums}
+    .tn{padding:8px 16px;font-size:11px;color:#9ca3af;border-bottom:.5px solid #e5e7eb}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>手術費用 概算ツール</h1>
+
+    <div class="grid">
+    <!-- 左カラム -->
+    <div class="col-left">
+
+<div class="card">
+        <div class="ch">基本情報</div>
+        <div class="cb">
+          <div class="tg mb14">
+            <button class="tb on" id="btn-inu">犬</button>
+            <button class="tb" id="btn-neko">猫</button>
+          </div>
+          <div class="mb14">
+            <label class="field">体重 (kg)</label>
+            <input type="number" id="weight" step="0.1" min="0.1" placeholder="例：5.0" style="width:100%">
+          </div>
+          <div class="checks">
+            <label class="ck"><input type="checkbox" id="isBrachy"><span id="bw" style="color:#BA7517"></span>短頭種</label>
+            <label class="ck"><input type="checkbox" id="isSenior">10歳以上</label>
+          </div>
+        </div>
+      </div>
+
+<div class="card">
+        <div class="ch">検査</div>
+        <div class="cb">
+          <div class="row"><input type="checkbox" id="eCBC" checked><span class="rl">CBC</span><span class="rp">¥2,000</span></div>
+          <div class="row"><input type="checkbox" id="eBioc" checked><span class="rl">生化学（スクリーニング・電解質込み）</span><span class="rp">¥5,950</span></div>
+          <div class="bsub">
+            <input type="checkbox" id="eBiocAdd" style="width:15px;height:15px">
+            <span style="font-size:12px;color:#6b7280;flex:1">追加項目</span>
+            <span class="yen" style="font-size:12px;color:#9ca3af">¥</span>
+            <input type="number" id="biocAddP" placeholder="0" disabled style="width:75px;font-size:14px;text-align:right;opacity:.4">
+          </div>
+          <div class="row"><input type="checkbox" id="eCoag"><span class="rl">凝固検査</span><span class="rp">¥3,500</span></div>
+          <div class="row"><input type="checkbox" id="eAUS"><span class="rl">腹部超音波検査</span><span class="rp">¥12,500</span></div>
+          <div class="row"><input type="checkbox" id="eCUS"><span class="rl">心臓超音波検査</span><span class="rp">¥5,000</span></div>
+          <div class="row"><input type="checkbox" id="ePath"><span class="rl">病理組織検査</span><span class="rp">¥17,800</span></div>
+          <div class="row"><input type="checkbox" id="eCyto"><span class="rl">細胞診検査</span><span class="rp">¥9,600</span></div>
+          <div class="row"><input type="checkbox" id="eDXR"><span class="rl">歯科レントゲン</span><span class="rp">¥8,000</span></div>
+          <div class="div">
+            <div class="cr" style="margin-bottom:2px">
+              <span style="font-size:13px;flex:1">胸部レントゲン</span>
+              <button class="cbtn" id="xc-m">−</button>
+              <span class="cv" id="vxc">0</span>
+              <button class="cbtn" id="xc-p">＋</button>
+              <span class="cu">枚</span>
+              <span class="cp" id="pxc"></span>
+            </div>
+            <div class="cr">
+              <span style="font-size:13px;flex:1">腹部レントゲン</span>
+              <button class="cbtn" id="xa-m">−</button>
+              <span class="cv" id="vxa">0</span>
+              <button class="cbtn" id="xa-p">＋</button>
+              <span class="cu">枚</span>
+              <span class="cp" id="pxa"></span>
+            </div>
+          </div>
+          <div class="divs">
+            <div style="display:flex;align-items:center;gap:8px">
+              <input type="checkbox" id="eOther"><span style="font-size:13px">その他</span>
+            </div>
+            <div id="otherIn" style="display:none">
+              <div class="or">
+                <input type="text" id="otherNm" placeholder="検査名">
+                <span class="yen">¥</span>
+                <input type="number" id="otherP" placeholder="0" style="width:85px;text-align:right">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+<div class="card">
+        <div class="ch">術式</div>
+        <div class="cb">
+          <div class="tg mb14">
+            <button class="tb on" id="btn-shika">歯科</button>
+            <button class="tb" id="btn-hyoumen">体表腫瘤</button>
+            <button class="tb" id="btn-other">その他</button>
+          </div>
+          <div id="pd">
+            <div class="row">
+              <input type="checkbox" id="scaling" checked>
+              <span class="rl">歯石除去（スケーリング）</span>
+              <span class="rp on" id="scP">—</span>
+            </div>
+            <div id="scSevRow" style="padding:6px 0 6px 26px;border-bottom:.5px solid #e5e7eb">
+              <div class="tg" style="margin-bottom:0;gap:5px">
+                <button class="tb on" id="sc-n" style="font-size:12px;padding:6px 0">普通</button>
+                <button class="tb" id="sc-m" style="font-size:12px;padding:6px 0">中程度</button>
+                <button class="tb" id="sc-h" style="font-size:12px;padding:6px 0">重度</button>
+              </div>
+            </div>
+            <!-- 抜歯（簡単） -->
+            <div class="row" style="flex-wrap:wrap;gap:6px 10px">
+              <span class="rl" style="font-size:12px;min-width:160px">抜歯（簡単） ¥1,000~/本</span>
+              <div style="display:flex;align-items:center;gap:7px;margin-left:auto">
+                <button class="cbtn" id="e1-m">−</button><span class="cv" id="ve1">0</span><button class="cbtn" id="e1-p">＋</button>
+                <span class="cu">本</span><span class="cp" id="pe1"></span>
+              </div>
+            </div>
+            <div class="bsub" style="gap:6px">
+              <span style="font-size:12px;color:#6b7280;flex:1">フラップ作成 ¥1,500/箇所</span>
+              <button class="cbtn" id="f1-m" style="width:28px;height:28px;font-size:16px">−</button>
+              <span class="cv" id="vf1" style="font-size:14px">0</span>
+              <button class="cbtn" id="f1-p" style="width:28px;height:28px;font-size:16px">＋</button>
+              <span class="cu">箇所</span>
+              <span class="cp" id="pf1" style="min-width:60px"></span>
+            </div>
+            <!-- 抜歯（2根） -->
+            <div class="row" style="flex-wrap:wrap;gap:6px 10px">
+              <span class="rl" style="font-size:12px;min-width:160px">抜歯（2根分割） ¥4,000~/本</span>
+              <div style="display:flex;align-items:center;gap:7px;margin-left:auto">
+                <button class="cbtn" id="e2-m">−</button><span class="cv" id="ve2">0</span><button class="cbtn" id="e2-p">＋</button>
+                <span class="cu">本</span><span class="cp" id="pe2"></span>
+              </div>
+            </div>
+            <div class="bsub" style="gap:6px">
+              <span style="font-size:12px;color:#6b7280;flex:1">フラップ作成 ¥3,500/箇所</span>
+              <button class="cbtn" id="f2-m" style="width:28px;height:28px;font-size:16px">−</button>
+              <span class="cv" id="vf2" style="font-size:14px">0</span>
+              <button class="cbtn" id="f2-p" style="width:28px;height:28px;font-size:16px">＋</button>
+              <span class="cu">箇所</span>
+              <span class="cp" id="pf2" style="min-width:60px"></span>
+            </div>
+            <!-- 抜歯（3根） -->
+            <div class="row" style="flex-wrap:wrap;gap:6px 10px">
+              <span class="rl" style="font-size:12px;min-width:160px">抜歯（3根分割） ¥8,000/本</span>
+              <div style="display:flex;align-items:center;gap:7px;margin-left:auto">
+                <button class="cbtn" id="e3-m">−</button><span class="cv" id="ve3">0</span><button class="cbtn" id="e3-p">＋</button>
+                <span class="cu">本</span><span class="cp" id="pe3"></span>
+              </div>
+            </div>
+            <div class="bsub" style="border-bottom:none;gap:6px">
+              <span style="font-size:12px;color:#6b7280;flex:1">フラップ作成 ¥4,000/箇所</span>
+              <button class="cbtn" id="f3-m" style="width:28px;height:28px;font-size:16px">−</button>
+              <span class="cv" id="vf3" style="font-size:14px">0</span>
+              <button class="cbtn" id="f3-p" style="width:28px;height:28px;font-size:16px">＋</button>
+              <span class="cu">箇所</span>
+              <span class="cp" id="pf3" style="min-width:60px"></span>
+            </div>
+          </div>
+          <div id="ph" style="display:none">
+            <!-- 皮膚腫瘤切除（1〜3糸） -->
+            <div style="padding:8px 0;border-bottom:.5px solid #e5e7eb">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                <span style="font-size:12px;flex:1;font-weight:500">皮膚腫瘤切除（1〜3糸）¥13,000〜</span>
+                <button class="cbtn" id="t1-m">−</button><span class="cv" id="vt1">0</span><button class="cbtn" id="t1-p">＋</button>
+                <span class="cu">箇所</span><span class="cp" id="pt1" style="min-width:60px"></span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;padding:5px 0 0 12px">
+                <span style="font-size:12px;color:#6b7280;flex:1">皮下組織縫合 ¥3,000/箇所</span>
+                <button class="cbtn" id="sb1-m" style="width:28px;height:28px;font-size:16px">−</button><span class="cv" id="vsb1" style="font-size:13px">0</span><button class="cbtn" id="sb1-p" style="width:28px;height:28px;font-size:16px">＋</button>
+                <span class="cu">箇所</span><span class="cp" id="psb1" style="min-width:60px;font-size:12px"></span>
+              </div>
+            </div>
+            <!-- 皮膚腫瘤切除（4〜6糸） -->
+            <div style="padding:8px 0;border-bottom:.5px solid #e5e7eb">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                <span style="font-size:12px;flex:1;font-weight:500">皮膚腫瘤切除（4〜6糸）¥16,000〜</span>
+                <button class="cbtn" id="t2-m">−</button><span class="cv" id="vt2">0</span><button class="cbtn" id="t2-p">＋</button>
+                <span class="cu">箇所</span><span class="cp" id="pt2" style="min-width:60px"></span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;padding:5px 0 0 12px">
+                <span style="font-size:12px;color:#6b7280;flex:1">皮下組織縫合 ¥3,000/箇所</span>
+                <button class="cbtn" id="sb2-m" style="width:28px;height:28px;font-size:16px">−</button><span class="cv" id="vsb2" style="font-size:13px">0</span><button class="cbtn" id="sb2-p" style="width:28px;height:28px;font-size:16px">＋</button>
+                <span class="cu">箇所</span><span class="cp" id="psb2" style="min-width:60px;font-size:12px"></span>
+              </div>
+            </div>
+            <!-- 皮膚腫瘤切除（7〜10糸） -->
+            <div style="padding:8px 0;border-bottom:.5px solid #e5e7eb">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                <span style="font-size:12px;flex:1;font-weight:500">皮膚腫瘤切除（7〜10糸）¥20,000〜</span>
+                <button class="cbtn" id="t3-m">−</button><span class="cv" id="vt3">0</span><button class="cbtn" id="t3-p">＋</button>
+                <span class="cu">箇所</span><span class="cp" id="pt3" style="min-width:60px"></span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;padding:5px 0 0 12px">
+                <span style="font-size:12px;color:#6b7280;flex:1">皮下組織縫合 ¥3,000/箇所</span>
+                <button class="cbtn" id="sb3-m" style="width:28px;height:28px;font-size:16px">−</button><span class="cv" id="vsb3" style="font-size:13px">0</span><button class="cbtn" id="sb3-p" style="width:28px;height:28px;font-size:16px">＋</button>
+                <span class="cu">箇所</span><span class="cp" id="psb3" style="min-width:60px;font-size:12px"></span>
+              </div>
+            </div>
+            <!-- パンチバイオプシー -->
+            <div style="padding:8px 0;border-bottom:.5px solid #e5e7eb">
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="font-size:12px;flex:1;font-weight:500">パンチバイオプシー ¥6,000〜</span>
+                <button class="cbtn" id="pbx-m">−</button><span class="cv" id="vpbx">0</span><button class="cbtn" id="pbx-p">＋</button>
+                <span class="cu">箇所</span><span class="cp" id="ppbx" style="min-width:60px"></span>
+              </div>
+            </div>
+            <!-- レーザー蒸散 -->
+            <div style="padding:8px 0 4px">
+              <div class="row" style="margin-bottom:4px">
+                <input type="checkbox" id="laserBase"><span class="rl" style="font-size:12px;font-weight:500">レーザー蒸散 基本使用料</span><span class="rp">¥3,000</span>
+              </div>
+              <div class="cr" style="padding:5px 0 5px 12px">
+                <span style="font-size:12px;flex:1;color:#6b7280">&lt;5mm</span>
+                <button class="cbtn" id="ls5-m" style="width:28px;height:28px;font-size:16px">−</button><span class="cv" id="vls5" style="font-size:13px">0</span><button class="cbtn" id="ls5-p" style="width:28px;height:28px;font-size:16px">＋</button>
+                <span class="cu">箇所</span><span class="cp" id="pls5" style="min-width:60px;font-size:12px"></span>
+              </div>
+              <div class="cr" style="padding:5px 0 5px 12px">
+                <span style="font-size:12px;flex:1;color:#6b7280">&lt;10mm</span>
+                <button class="cbtn" id="ls10-m" style="width:28px;height:28px;font-size:16px">−</button><span class="cv" id="vls10" style="font-size:13px">0</span><button class="cbtn" id="ls10-p" style="width:28px;height:28px;font-size:16px">＋</button>
+                <span class="cu">箇所</span><span class="cp" id="pls10" style="min-width:60px;font-size:12px"></span>
+              </div>
+              <div class="cr" style="padding:5px 0 5px 12px">
+                <span style="font-size:12px;flex:1;color:#6b7280">&lt;15mm</span>
+                <button class="cbtn" id="ls15-m" style="width:28px;height:28px;font-size:16px">−</button><span class="cv" id="vls15" style="font-size:13px">0</span><button class="cbtn" id="ls15-p" style="width:28px;height:28px;font-size:16px">＋</button>
+                <span class="cu">箇所</span><span class="cp" id="pls15" style="min-width:60px;font-size:12px"></span>
+              </div>
+            </div>
+          </div>
+          <div id="po" style="display:none">
+            <div class="pr">
+              <span class="prl">手術料（税抜）</span>
+              <div class="pri"><span class="yen">¥</span><input type="number" id="surgP" placeholder="0" style="width:100px;text-align:right"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /col-left -->
+
+    <!-- 右カラム -->
+    <div class="col-right">
+
+<div class="card">
+        <div class="ch">麻酔</div>
+        <div class="cb">
+          <div class="tg">
+            <button class="tb on" id="btn-zenshin">全身麻酔</button>
+            <button class="tb" id="btn-chinsei">鎮静</button>
+          </div>
+
+          <!-- 全身麻酔 -->
+          <div id="ane-zenshin">
+            <div class="row">
+              <span class="rl">基本麻酔料<span id="aneBaseNote" style="font-size:11px;color:#9ca3af;margin-left:6px"></span></span>
+              <span class="rp on" id="aneBaseP">¥12,000</span>
+            </div>
+            <div class="row">
+              <span class="rl" style="font-size:13px">追加時間</span>
+              <div style="display:flex;align-items:center;gap:8px">
+                <button class="cbtn" id="et-m">−</button>
+                <span class="cv" id="vet">0</span>
+                <button class="cbtn" id="et-p">＋</button>
+                <span class="cu">×15分</span>
+                <span class="cp" id="pet"></span>
+              </div>
+            </div>
+            <div class="row">
+              <span class="rl">基礎疾患加算</span>
+              <div class="pri"><span class="yen">¥</span><input type="number" id="kisoP" placeholder="0" style="width:90px;text-align:right"></div>
+            </div>
+            <div class="divs">
+              <p style="font-size:11px;color:#6b7280;margin-bottom:8px;font-weight:500">麻酔関連薬剤</p>
+              <div class="row"><input type="checkbox" id="rxCath"><span class="rl">静脈カテーテル</span><span class="rp">¥2,500</span></div>
+              <div class="row"><input type="checkbox" id="rxOnsior"><span class="rl">オンシオール<span id="onsiorNote" style="font-size:11px;color:#9ca3af;margin-left:6px"></span></span><span class="rp on" id="onsiorP">¥1,500</span></div>
+              <div class="row"><input type="checkbox" id="rxAbx"><span class="rl">抗生剤</span><span class="rp">¥750</span></div>
+              <div class="row"><input type="checkbox" id="opMorphine"><span class="rl">モルヒネ</span><span class="rp">¥8,000</span></div>
+              <div class="row"><input type="checkbox" id="opFentCRI"><span class="rl">フェンタニルCRI</span><span class="rp">¥15,000</span></div>
+              <div class="row"><input type="checkbox" id="opFent21"><span class="rl">フェンタニルパッチ 2.1mg</span><span class="rp">¥12,000</span></div>
+              <div class="row"><input type="checkbox" id="opFent42"><span class="rl">フェンタニルパッチ 4.2mg</span><span class="rp">¥13,500</span></div>
+              <div class="row"><input type="checkbox" id="opFent84"><span class="rl">フェンタニルパッチ 8.4mg</span><span class="rp">¥15,000</span></div>
+              <div style="border-top:.5px solid #e5e7eb;margin-top:4px;padding-top:8px">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <input type="checkbox" id="aneOther"><span style="font-size:13px">その他</span>
+                </div>
+                <div id="aneOtherIn" style="display:none">
+                  <div class="or">
+                    <input type="text" id="aneOtherNm" placeholder="薬品名">
+                    <span class="yen">¥</span>
+                    <input type="number" id="aneOtherP" placeholder="0" style="width:85px;text-align:right">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 鎮静 -->
+          <div id="ane-chinsei" style="display:none">
+            <div class="row last">
+              <span class="rl">鎮静料<span id="sedNote" style="font-size:11px;color:#9ca3af;margin-left:6px"></span></span>
+              <span class="rp on" id="sedP">¥8,000</span>
+            </div>
+            <p style="margin-top:8px;font-size:11px;color:#9ca3af">※ 20分以内</p>
+          </div>
+
+          <!-- 局所麻酔（常時） -->
+          <div class="divs">
+            <div class="cr">
+              <span style="font-size:13px;flex:1">局所麻酔</span>
+              <button class="cbtn" id="lc-m">−</button>
+              <span class="cv" id="vlc">0</span>
+              <button class="cbtn" id="lc-p">＋</button>
+              <span class="cu">箇所</span>
+              <span class="cp" id="plc"></span>
+            </div>
+            <div id="lcNote" style="display:none;margin-top:4px;font-size:11px;color:#9ca3af">1箇所 ¥2,000 ＋ 追加1箇所ごとに ¥600</div>
+          </div>
+        </div>
+      </div>
+
+<div class="card">
+        <div class="ch">入院費</div>
+        <div class="cb">
+          <!-- 入院日数カウンター -->
+          <div class="cr" style="padding:8px 0;border-bottom:.5px solid #e5e7eb">
+            <span style="font-size:13px;flex:1">入院費（１泊）</span>
+            <button class="cbtn" id="nd-m">−</button>
+            <span class="cv" id="vnd">0</span>
+            <button class="cbtn" id="nd-p">＋</button>
+            <span class="cu">泊</span>
+            <span class="cp" id="pnd"></span>
+          </div>
+          <div class="row">
+            <input type="checkbox" id="rxNurseA">
+            <span class="rl">入院看護A</span>
+            <span class="rp">¥2,500/泊</span>
+          </div>
+          <div class="row">
+            <input type="checkbox" id="rxNurse">
+            <span class="rl">入院看護B</span>
+            <span class="rp">¥5,000/泊</span>
+          </div>
+          <div class="row">
+            <input type="checkbox" id="rxNurseC">
+            <span class="rl">入院看護C</span>
+            <span class="rp">¥7,500/泊</span>
+          </div>
+          <div class="row">
+            <input type="checkbox" id="rxWild">
+            <span class="rl">Wild料金</span>
+            <span class="rp">¥2,000/泊</span>
+          </div>
+          <div class="pr">
+            <span class="prl">点滴</span>
+            <div class="pri"><span class="yen">¥</span><input type="number" id="tentekiFeeInput" placeholder="0" style="width:110px;text-align:right"></div>
+          </div>
+          <div class="pr">
+            <span class="prl">注射薬</span>
+            <div class="pri"><span class="yen">¥</span><input type="number" id="chushaFeeInput" placeholder="0" style="width:110px;text-align:right"></div>
+          </div>
+          <div class="divs">
+            <div style="display:flex;align-items:center;gap:8px">
+              <input type="checkbox" id="rxOther"><span style="font-size:13px">その他</span>
+            </div>
+            <div id="rxOtherIn" style="display:none">
+              <div class="or">
+                <input type="text" id="rxOtherNm" placeholder="薬品名">
+                <span class="yen">¥</span>
+                <input type="number" id="rxOtherP" placeholder="0" style="width:85px;text-align:right">
+              </div>
+            </div>
+          </div>
+          <div class="divs">
+            <div class="pr last">
+              <span class="prl">予備費</span>
+              <div class="pri"><span class="yen">¥</span><input type="number" id="yobiP" placeholder="0" style="width:110px;text-align:right"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /col-right -->
+
+  </div><!-- /grid -->
+
+  <!-- 内訳・合計：グリッドの外・ページ最下部 -->
+  <div class="card" style="margin-top:16px;margin-bottom:0">
+    <div class="ch">内訳・合計</div>
+    <div id="breakdown"><div class="be">項目にチェックを入れると合計が表示されます</div></div>
+    <div class="tn">※ サンプル料金による概算です。実際の費用は診察・術中所見により変動します。</div>
+    <div class="ta">
+      <div class="ts"><span>小計（税抜）</span><span id="sub">¥0</span></div>
+      <div class="ts"><span>消費税（10%）</span><span id="tax">¥0</span></div>
+      <div class="tm"><span class="tl">合計（税込概算）</span><span class="tv" id="tot">¥0</span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+var ST={species:'inu',proc:'shika',ane:'zenshin',xc:0,xa:0,lc:0,et:0,e1:0,e2:0,e3:0,f1:0,f2:0,f3:0,scSev:'n',nyuinDays:0,t1:0,t2:0,t3:0,sb1:0,sb2:0,sb3:0,ls5:0,ls10:0,ls15:0,pbx:0};
+var fmt=function(n){return Math.round(n).toLocaleString('ja-JP');};
+var xFee=function(n){return n>0?4500+(n-1)*1500:0;};
+var lFee=function(n){return n>0?2000+(n-1)*600:0;};
+function nyuinFeePerNight(sp,w){
+  if(sp==='neko') return 4000;
+  if(w<5)  return 4000;
+  if(w<10) return 4500;
+  if(w<15) return 5000;
+  if(w<20) return 6000;
+  if(w<30) return 7000;
+  if(w<40) return 8000;
+  if(w<50) return 9000;
+  return 10000;
+}
+function onsiorFee(w){return 1500+(w>5?Math.round((w-5)*50):0);}
+function aneFee(senior){return senior?16000:12000;}
+function sedFee(senior){return senior?12000:8000;}
+function scFee(sp,w,sev){
+  var t;
+  if(sp==='neko'||w<=5)       t={n:20000,m:23000,h:26000};
+  else if(w<=10) t={n:25000,m:28000,h:31000};
+  else if(w<=15) t={n:28000,m:31000,h:34000};
+  else if(w<=20) t={n:32000,m:35000,h:38000};
+  else if(w<=25) t={n:36000,m:39000,h:42000};
+  else           t={n:40000,m:45000,h:50000};
+  return sev==='m'?t.m:sev==='h'?t.h:t.n;
+}
+function setActive(ids,activeId){ids.forEach(function(id){document.getElementById(id).classList.remove('on');});document.getElementById(activeId).classList.add('on');}
+
+function update(){
+  var w=parseFloat(document.getElementById('weight').value)||0;
+  var brachy=document.getElementById('isBrachy').checked;
+  var sc=document.getElementById('scaling').checked;
+  var scEl=document.getElementById('scP');
+  var onEl=document.getElementById('onsiorP');
+  if(onEl){onEl.textContent='¥'+fmt(onsiorFee(w));document.getElementById('onsiorNote').textContent=w>5?'('+w+'kg)':'';}
+  if(sc&&w>0){scEl.textContent='¥'+fmt(scFee(ST.species,w,ST.scSev));scEl.className='rp on';}
+  else{scEl.textContent='—';scEl.className='rp';}
+
+  var rows=[];
+  if(document.getElementById('eCBC').checked) rows.push({cat:'検査',name:'CBC',amount:2000});
+  if(document.getElementById('eBioc').checked) rows.push({cat:'検査',name:'生化学（スクリーニング・電解質込み）',amount:5950});
+  if(document.getElementById('eBiocAdd').checked){var bp=parseInt(document.getElementById('biocAddP').value)||0;if(bp>0)rows.push({cat:'検査',name:'生化学（追加項目）',amount:bp});}
+  if(document.getElementById('eCoag').checked) rows.push({cat:'検査',name:'凝固検査',amount:3500});
+  if(document.getElementById('eAUS').checked) rows.push({cat:'検査',name:'腹部超音波検査',amount:12500});
+  if(document.getElementById('eCUS').checked) rows.push({cat:'検査',name:'心臓超音波検査',amount:12500});
+  if(document.getElementById('ePath').checked) rows.push({cat:'検査',name:'病理組織検査',amount:17800});
+  if(document.getElementById('eCyto').checked) rows.push({cat:'検査',name:'細胞診検査',amount:9600});
+  if(document.getElementById('eOther').checked){var op=parseInt(document.getElementById('otherP').value)||0;var onm=document.getElementById('otherNm').value||'その他検査';if(op>0)rows.push({cat:'検査',name:onm,amount:op});}
+  if(ST.xc>0) rows.push({cat:'検査',name:'胸部レントゲン（'+ST.xc+'枚）',amount:xFee(ST.xc)});
+  if(ST.xa>0) rows.push({cat:'検査',name:'腹部レントゲン（'+ST.xa+'枚）',amount:xFee(ST.xa)});
+
+  // 体表腫瘤
+  if(ST.proc==='hyoumen'){
+    if(ST.t1>0){rows.push({cat:'手術',name:'皮膚腫瘤切除（1〜3糸）×'+ST.t1,amount:13000+(ST.t1-1)*6000});if(ST.sb1>0) rows.push({cat:'手術',name:'皮下組織縫合（1〜3糸）×'+ST.sb1,amount:3000*ST.sb1});}
+    if(ST.t2>0){rows.push({cat:'手術',name:'皮膚腫瘤切除（4〜6糸）×'+ST.t2,amount:16000+(ST.t2-1)*10000});if(ST.sb2>0) rows.push({cat:'手術',name:'皮下組織縫合（4〜6糸）×'+ST.sb2,amount:3000*ST.sb2});}
+    if(ST.t3>0){rows.push({cat:'手術',name:'皮膚腫瘤切除（7〜10糸）×'+ST.t3,amount:20000+(ST.t3-1)*15000});if(ST.sb3>0) rows.push({cat:'手術',name:'皮下組織縫合（7〜10糸）×'+ST.sb3,amount:3000*ST.sb3});}
+    if(ST.pbx>0) rows.push({cat:'手術',name:'パンチバイオプシー（'+ST.pbx+'箇所）',amount:6000+(ST.pbx-1)*5000});
+    if(document.getElementById('laserBase').checked) rows.push({cat:'手術',name:'レーザー蒸散 基本使用料',amount:3000});
+    if(ST.ls5>0)  rows.push({cat:'手術',name:'レーザー蒸散 <5mm（'+ST.ls5+'箇所）',amount:2300*ST.ls5});
+    if(ST.ls10>0) rows.push({cat:'手術',name:'レーザー蒸散 <10mm（'+ST.ls10+'箇所）',amount:2800*ST.ls10});
+    if(ST.ls15>0) rows.push({cat:'手術',name:'レーザー蒸散 <15mm（'+ST.ls15+'箇所）',amount:3500*ST.ls15});
+  }
+  if(ST.proc==='shika'){
+    if(sc&&w>0) rows.push({cat:'手術',name:'歯石除去（スケーリング）',amount:scFee(ST.species,w,ST.scSev)});
+    if(ST.e1>0) rows.push({cat:'手術',name:'抜歯 簡単（'+ST.e1+'本）',amount:1000*ST.e1});
+    if(ST.f1>0) rows.push({cat:'手術',name:'フラップ作成 簡単（'+ST.f1+'箇所）',amount:1500*ST.f1});
+    if(ST.e2>0) rows.push({cat:'手術',name:'抜歯 2根分割（'+ST.e2+'本）',amount:4000*ST.e2});
+    if(ST.f2>0) rows.push({cat:'手術',name:'フラップ作成 2根（'+ST.f2+'箇所）',amount:3500*ST.f2});
+    if(ST.e3>0) rows.push({cat:'手術',name:'抜歯 3根分割（'+ST.e3+'本）',amount:8000*ST.e3});
+    if(ST.f3>0) rows.push({cat:'手術',name:'フラップ作成 3根（'+ST.f3+'箇所）',amount:4000*ST.f3});
+  }else{
+    var sf=parseInt(document.getElementById('surgP').value)||0;
+    if(sf>0) rows.push({cat:'手術',name:'手術料',amount:sf});
+  }
+
+  var senior=document.getElementById('isSenior').checked;
+  if(ST.ane==='zenshin'){
+    var baseAne=aneFee(senior);
+    rows.push({cat:'麻酔',name:'全身麻酔（'+(senior?'10歳以上':'10歳未満')+'）',amount:baseAne});
+    if(ST.et>0) rows.push({cat:'麻酔',name:'追加時間（'+ST.et+'×15分）',amount:ST.et*2500});
+    var kiso=parseInt(document.getElementById('kisoP').value)||0;
+    if(kiso>0) rows.push({cat:'麻酔',name:'基礎疾患加算',amount:kiso});
+    var opioids=[['opMorphine','モルヒネ',8000],['opFentCRI','フェンタニルCRI',15000],['opFent21','フェンタニルパッチ 2.1mg',12000],['opFent42','フェンタニルパッチ 4.2mg',13500],['opFent84','フェンタニルパッチ 8.4mg',15000]];
+    opioids.forEach(function(o){if(document.getElementById(o[0]).checked)rows.push({cat:'麻酔',name:o[1],amount:o[2]});});
+  } else {
+    rows.push({cat:'麻酔',name:'鎮静（'+(senior?'10歳以上':'10歳未満')+'）',amount:sedFee(senior)});
+  }
+  if(brachy&&w>0) rows.push({cat:'麻酔',name:'短頭種加算',amount:5000});
+  if(ST.lc>0) rows.push({cat:'麻酔',name:'局所麻酔（'+ST.lc+'箇所）',amount:lFee(ST.lc)});
+  // 処方
+  var yp=parseInt(document.getElementById('yobiP')&&document.getElementById('yobiP').value)||0;
+  if(yp>0) rows.push({cat:'予備費',name:'予備費',amount:yp});
+  // 麻酔関連薬剤（静脈カテーテル・オンシオール・抗生剤はここで計上）
+  if(document.getElementById('rxCath').checked) rows.push({cat:'麻酔',name:'静脈カテーテル',amount:2500});
+  if(document.getElementById('rxOnsior').checked) rows.push({cat:'麻酔',name:'オンシオール',amount:onsiorFee(w)});
+  if(document.getElementById('rxAbx').checked) rows.push({cat:'麻酔',name:'抗生剤',amount:750});
+  if(document.getElementById('aneOther')&&document.getElementById('aneOther').checked){var aop=parseInt(document.getElementById('aneOtherP').value)||0;var aonm=document.getElementById('aneOtherNm').value||'その他';if(aop>0)rows.push({cat:'麻酔',name:aonm,amount:aop});}
+  // 入院費
+  if(ST.nyuinDays>0){var nfr=nyuinFeePerNight(ST.species,parseFloat(document.getElementById('weight').value)||0);rows.push({cat:'入院費',name:'入院費（'+ST.nyuinDays+'泊）',amount:nfr*ST.nyuinDays});}
+  if(document.getElementById('rxNurseA')&&document.getElementById('rxNurseA').checked&&ST.nyuinDays>0) rows.push({cat:'入院費',name:'入院看護A（'+ST.nyuinDays+'泊）',amount:2500*ST.nyuinDays});
+  if(document.getElementById('rxNurse').checked&&ST.nyuinDays>0) rows.push({cat:'入院費',name:'入院看護B（'+ST.nyuinDays+'泊）',amount:5000*ST.nyuinDays});
+  if(document.getElementById('rxNurseC')&&document.getElementById('rxNurseC').checked&&ST.nyuinDays>0) rows.push({cat:'入院費',name:'入院看護C（'+ST.nyuinDays+'泊）',amount:7500*ST.nyuinDays});
+  if(document.getElementById('rxWild')&&document.getElementById('rxWild').checked&&ST.nyuinDays>0) rows.push({cat:'入院費',name:'Wild料金（'+ST.nyuinDays+'泊）',amount:2000*ST.nyuinDays});
+  var tf=parseInt(document.getElementById('tentekiFeeInput')&&document.getElementById('tentekiFeeInput').value)||0;
+  if(tf>0) rows.push({cat:'入院費',name:'点滴',amount:tf});
+  var cf=parseInt(document.getElementById('chushaFeeInput')&&document.getElementById('chushaFeeInput').value)||0;
+  if(cf>0) rows.push({cat:'入院費',name:'注射薬',amount:cf});
+  // 処方・その他
+  if(document.getElementById('rxOther')&&document.getElementById('rxOther').checked){var rp=parseInt(document.getElementById('rxOtherP').value)||0;var rnm=document.getElementById('rxOtherNm').value||'その他';if(rp>0)rows.push({cat:'入院費',name:rnm,amount:rp});}
+  // 術前検査：歯科レントゲン
+  if(document.getElementById('eDXR')&&document.getElementById('eDXR').checked) rows.push({cat:'検査',name:'歯科レントゲン',amount:8000});
+
+  var sub=rows.reduce(function(s,r){return s+r.amount;},0);
+  var tax=Math.round(sub*0.1);
+  var tot=sub+tax;
+
+  var grouped={};
+  rows.forEach(function(r){if(!grouped[r.cat])grouped[r.cat]=[];grouped[r.cat].push(r);});
+  var html='';
+  if(!rows.length){html='<div class="be">項目にチェックを入れると合計が表示されます</div>';}
+  else{Object.keys(grouped).forEach(function(cat){html+='<div class="bc">'+cat+'</div>';grouped[cat].forEach(function(r){html+='<div class="br"><span class="brnm">'+r.name+'</span><span class="bram">¥'+fmt(r.amount)+'</span></div>';});});}
+  document.getElementById('breakdown').innerHTML=html;
+  document.getElementById('sub').textContent='¥'+fmt(sub);
+  document.getElementById('tax').textContent='¥'+fmt(tax);
+  document.getElementById('tot').textContent='¥'+fmt(tot);
+}
+
+function makeCounter(mId,pId,vId,cpId,key,feeFn,noteId){
+  document.getElementById(mId).addEventListener('click',function(){
+    ST[key]=Math.max(0,ST[key]-1);
+    document.getElementById(vId).textContent=ST[key];
+    document.getElementById(cpId).textContent=ST[key]>0?'¥'+fmt(feeFn(ST[key])):'';
+    if(noteId)document.getElementById(noteId).style.display=ST[key]>0?'':'none';
+    update();
+  });
+  document.getElementById(pId).addEventListener('click',function(){
+    ST[key]+=1;
+    document.getElementById(vId).textContent=ST[key];
+    document.getElementById(cpId).textContent='¥'+fmt(feeFn(ST[key]));
+    if(noteId)document.getElementById(noteId).style.display='';
+    update();
+  });
+}
+
+document.addEventListener('DOMContentLoaded',function(){
+  document.getElementById('btn-inu').addEventListener('click',function(){ST.species='inu';setActive(['btn-inu','btn-neko'],'btn-inu');update();});
+  document.getElementById('btn-neko').addEventListener('click',function(){ST.species='neko';setActive(['btn-inu','btn-neko'],'btn-neko');update();});
+  document.getElementById('btn-shika').addEventListener('click',function(){ST.proc='shika';setActive(['btn-shika','btn-hyoumen','btn-other'],'btn-shika');document.getElementById('pd').style.display='';document.getElementById('ph').style.display='none';document.getElementById('po').style.display='none';update();});
+  document.getElementById('btn-hyoumen').addEventListener('click',function(){ST.proc='hyoumen';setActive(['btn-shika','btn-hyoumen','btn-other'],'btn-hyoumen');document.getElementById('pd').style.display='none';document.getElementById('ph').style.display='';document.getElementById('po').style.display='none';update();});
+  document.getElementById('btn-other').addEventListener('click',function(){ST.proc='other';setActive(['btn-shika','btn-hyoumen','btn-other'],'btn-other');document.getElementById('pd').style.display='none';document.getElementById('ph').style.display='none';document.getElementById('po').style.display='';update();});
+  function updateAneDisplay(){
+    var senior=document.getElementById('isSenior').checked;
+    document.getElementById('aneBaseNote').textContent=senior?'10歳以上':'10歳未満';
+    document.getElementById('aneBaseP').textContent='¥'+fmt(aneFee(senior));
+    document.getElementById('sedNote').textContent=senior?'10歳以上':'10歳未満';
+    document.getElementById('sedP').textContent='¥'+fmt(sedFee(senior));
+  }
+  document.getElementById('btn-zenshin').addEventListener('click',function(){ST.ane='zenshin';setActive(['btn-zenshin','btn-chinsei'],'btn-zenshin');document.getElementById('ane-zenshin').style.display='';document.getElementById('ane-chinsei').style.display='none';update();});
+  document.getElementById('btn-chinsei').addEventListener('click',function(){ST.ane='chinsei';setActive(['btn-zenshin','btn-chinsei'],'btn-chinsei');document.getElementById('ane-zenshin').style.display='none';document.getElementById('ane-chinsei').style.display='';update();});
+
+  function extCounter(mId,pId,vId,cpId,key,unitPrice){
+    document.getElementById(mId).addEventListener('click',function(){ST[key]=Math.max(0,ST[key]-1);document.getElementById(vId).textContent=ST[key];document.getElementById(cpId).textContent=ST[key]>0?'¥'+fmt(unitPrice*ST[key]):'';update();});
+    document.getElementById(pId).addEventListener('click',function(){ST[key]+=1;document.getElementById(vId).textContent=ST[key];document.getElementById(cpId).textContent='¥'+fmt(unitPrice*ST[key]);update();});
+  }
+  ['n','m','h'].forEach(function(sev){
+    document.getElementById('sc-'+sev).addEventListener('click',function(){
+      ST.scSev=sev;
+      ['n','m','h'].forEach(function(s){document.getElementById('sc-'+s).classList.remove('on');});
+      this.classList.add('on');
+      update();
+    });
+  });
+  // スケーリングチェックで重症度トグルの表示切替
+  document.getElementById('scaling').addEventListener('change',function(){
+    document.getElementById('scSevRow').style.display=this.checked?'':'none';
+    update();
+  });
+  extCounter('e1-m','e1-p','ve1','pe1','e1',1000);
+  extCounter('f1-m','f1-p','vf1','pf1','f1',1500);
+  extCounter('e2-m','e2-p','ve2','pe2','e2',4000);
+  extCounter('f2-m','f2-p','vf2','pf2','f2',3500);
+  extCounter('e3-m','e3-p','ve3','pe3','e3',8000);
+  extCounter('f3-m','f3-p','vf3','pf3','f3',4000);
+
+  makeCounter('xc-m','xc-p','vxc','pxc','xc',xFee,null);
+  makeCounter('xa-m','xa-p','vxa','pxa','xa',xFee,null);
+  makeCounter('lc-m','lc-p','vlc','plc','lc',lFee,'lcNote');
+  document.getElementById('et-m').addEventListener('click',function(){
+    ST.et=Math.max(0,ST.et-1);
+    document.getElementById('vet').textContent=ST.et;
+    document.getElementById('pet').textContent=ST.et>0?'¥'+fmt(ST.et*2500):'';
+    update();
+  });
+  document.getElementById('et-p').addEventListener('click',function(){
+    ST.et+=1;
+    document.getElementById('vet').textContent=ST.et;
+    document.getElementById('pet').textContent='¥'+fmt(ST.et*2500);
+    update();
+  });
+  updateAneDisplay();
+
+  document.getElementById('isBrachy').addEventListener('change',function(){document.getElementById('bw').textContent=this.checked?'⚠ ':'';update();});
+  document.getElementById('isSenior').addEventListener('change',function(){
+    var v=this.checked;
+    document.getElementById('eCoag').checked=v;
+    document.getElementById('eCUS').checked=v;
+    updateAneDisplay();
+    update();
+  });
+  document.getElementById('eBiocAdd').addEventListener('change',function(){
+    var i=document.getElementById('biocAddP');i.disabled=!this.checked;i.style.opacity=this.checked?'1':'.4';update();
+  });
+  document.getElementById('eOther').addEventListener('change',function(){document.getElementById('otherIn').style.display=this.checked?'':'none';update();});
+  document.getElementById('rxOther').addEventListener('change',function(){document.getElementById('rxOtherIn').style.display=this.checked?'':'none';update();});
+  function tumCounter(mId,pId,vId,cpId,key,base,add){
+    document.getElementById(mId).addEventListener('click',function(){ST[key]=Math.max(0,ST[key]-1);document.getElementById(vId).textContent=ST[key];document.getElementById(cpId).textContent=ST[key]>0?'¥'+fmt(base+(ST[key]-1)*add):'';update();});
+    document.getElementById(pId).addEventListener('click',function(){ST[key]+=1;document.getElementById(vId).textContent=ST[key];document.getElementById(cpId).textContent='¥'+fmt(base+(ST[key]-1)*add);update();});
+  }
+  tumCounter('t1-m','t1-p','vt1','pt1','t1',13000,6000);
+  tumCounter('t2-m','t2-p','vt2','pt2','t2',16000,10000);
+  tumCounter('t3-m','t3-p','vt3','pt3','t3',20000,15000);
+  function laserCounter(mId,pId,vId,cpId,key,unitPrice){
+    document.getElementById(mId).addEventListener('click',function(){ST[key]=Math.max(0,ST[key]-1);document.getElementById(vId).textContent=ST[key];document.getElementById(cpId).textContent=ST[key]>0?'¥'+fmt(unitPrice*ST[key]):'';update();});
+    document.getElementById(pId).addEventListener('click',function(){ST[key]+=1;document.getElementById(vId).textContent=ST[key];document.getElementById(cpId).textContent='¥'+fmt(unitPrice*ST[key]);update();});
+  }
+  laserCounter('ls5-m','ls5-p','vls5','pls5','ls5',2300);
+  // 皮下組織縫合カウンター
+  function subCounter(mId,pId,vId,cpId,key){
+    document.getElementById(mId).addEventListener('click',function(){ST[key]=Math.max(0,ST[key]-1);document.getElementById(vId).textContent=ST[key];document.getElementById(cpId).textContent=ST[key]>0?'¥'+fmt(3000*ST[key]):'';update();});
+    document.getElementById(pId).addEventListener('click',function(){ST[key]+=1;document.getElementById(vId).textContent=ST[key];document.getElementById(cpId).textContent='¥'+fmt(3000*ST[key]);update();});
+  }
+  subCounter('sb1-m','sb1-p','vsb1','psb1','sb1');
+  subCounter('sb2-m','sb2-p','vsb2','psb2','sb2');
+  subCounter('sb3-m','sb3-p','vsb3','psb3','sb3');
+  // パンチバイオプシー
+  document.getElementById('pbx-m').addEventListener('click',function(){ST.pbx=Math.max(0,ST.pbx-1);document.getElementById('vpbx').textContent=ST.pbx;document.getElementById('ppbx').textContent=ST.pbx>0?'¥'+fmt(6000+(ST.pbx-1)*5000):'';update();});
+  document.getElementById('pbx-p').addEventListener('click',function(){ST.pbx+=1;document.getElementById('vpbx').textContent=ST.pbx;document.getElementById('ppbx').textContent='¥'+fmt(6000+(ST.pbx-1)*5000);update();});
+  laserCounter('ls10-m','ls10-p','vls10','pls10','ls10',2800);
+  laserCounter('ls15-m','ls15-p','vls15','pls15','ls15',3500);
+  document.getElementById('aneOther').addEventListener('change',function(){document.getElementById('aneOtherIn').style.display=this.checked?'':'none';update();});
+  document.getElementById('nd-m').addEventListener('click',function(){
+    ST.nyuinDays=Math.max(0,ST.nyuinDays-1);
+    document.getElementById('vnd').textContent=ST.nyuinDays;
+    var w=parseFloat(document.getElementById('weight').value)||0;
+    document.getElementById('pnd').textContent=ST.nyuinDays>0?'¥'+fmt(nyuinFeePerNight(ST.species,w)*ST.nyuinDays):'';
+    update();
+  });
+  document.getElementById('nd-p').addEventListener('click',function(){
+    ST.nyuinDays+=1;
+    var w=parseFloat(document.getElementById('weight').value)||0;
+    document.getElementById('vnd').textContent=ST.nyuinDays;
+    document.getElementById('pnd').textContent='¥'+fmt(nyuinFeePerNight(ST.species,w)*ST.nyuinDays);
+    update();
+  });
+
+  document.querySelectorAll('input').forEach(function(el){
+    el.addEventListener('change',update);
+    el.addEventListener('input',update);
+  });
+
+  update();
+});
+</script>
+</body>
+</html>
