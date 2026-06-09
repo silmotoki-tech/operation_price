@@ -71,6 +71,8 @@
     .div{border-top:.5px solid #e5e7eb;margin-top:4px;padding-top:10px}
     .divs{border-top:.5px solid #e5e7eb;margin-top:8px;padding-top:10px}
     .mb14{margin-bottom:14px}
+    .subhead{font-size:12px;font-weight:600;color:#5c3d1e;background:#f0ebe3;border-radius:5px;padding:5px 10px;margin:14px 0 8px}
+    #pd .subhead:first-child,.cb>.subhead:first-child{margin-top:0}
 
     .or{display:flex;gap:8px;align-items:center;margin-top:8px}
     .or input[type=text]{flex:1}
@@ -171,11 +173,7 @@
 <div class="card">
         <div class="ch">術式</div>
         <div class="cb">
-          <div class="tg mb14">
-            <button class="tb on" id="btn-shika">歯科</button>
-            <button class="tb" id="btn-hyoumen">体表腫瘤</button>
-            <button class="tb" id="btn-other">その他</button>
-          </div>
+          <div class="subhead">歯科</div>
           <div id="pd">
             <div class="row">
               <input type="checkbox" id="scaling" checked>
@@ -238,7 +236,8 @@
               <span class="cp" id="pf3" style="min-width:60px"></span>
             </div>
           </div>
-          <div id="ph" style="display:none">
+          <div class="subhead">体表腫瘤</div>
+          <div id="ph">
             <!-- 皮膚腫瘤切除（1〜3糸） -->
             <div style="padding:8px 0;border-bottom:.5px solid #e5e7eb">
               <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
@@ -308,7 +307,8 @@
               </div>
             </div>
           </div>
-          <div id="po" style="display:none">
+          <div class="subhead">その他</div>
+          <div id="po">
             <div class="pr">
               <span class="prl">手術料（税抜）</span>
               <div class="pri"><span class="yen">¥</span><input type="number" id="surgP" placeholder="0" style="width:100px;text-align:right"></div>
@@ -411,25 +411,25 @@
             <span class="cu">泊</span>
             <span class="cp" id="pnd"></span>
           </div>
-          <div class="row">
-            <input type="checkbox" id="rxNurseA">
-            <span class="rl">入院看護A</span>
-            <span class="rp">¥2,500/泊</span>
+          <div class="cr" style="border-bottom:.5px solid #e5e7eb">
+            <span style="font-size:13px;flex:1">入院看護A ¥2,500</span>
+            <button class="cbtn" id="na-m">−</button><span class="cv" id="vna">0</span><button class="cbtn" id="na-p">＋</button>
+            <span class="cu">日</span><span class="cp" id="pna"></span>
           </div>
-          <div class="row">
-            <input type="checkbox" id="rxNurse">
-            <span class="rl">入院看護B</span>
-            <span class="rp">¥5,000/泊</span>
+          <div class="cr" style="border-bottom:.5px solid #e5e7eb">
+            <span style="font-size:13px;flex:1">入院看護B ¥5,000</span>
+            <button class="cbtn" id="nb-m">−</button><span class="cv" id="vnb">0</span><button class="cbtn" id="nb-p">＋</button>
+            <span class="cu">日</span><span class="cp" id="pnb"></span>
           </div>
-          <div class="row">
-            <input type="checkbox" id="rxNurseC">
-            <span class="rl">入院看護C</span>
-            <span class="rp">¥7,500/泊</span>
+          <div class="cr" style="border-bottom:.5px solid #e5e7eb">
+            <span style="font-size:13px;flex:1">入院看護C ¥7,500</span>
+            <button class="cbtn" id="nc-m">−</button><span class="cv" id="vnc">0</span><button class="cbtn" id="nc-p">＋</button>
+            <span class="cu">日</span><span class="cp" id="pnc"></span>
           </div>
-          <div class="row">
-            <input type="checkbox" id="rxWild">
-            <span class="rl">Wild料金</span>
-            <span class="rp">¥2,000/泊</span>
+          <div class="cr" style="border-bottom:.5px solid #e5e7eb">
+            <span style="font-size:13px;flex:1">Wild料金 ¥2,000</span>
+            <button class="cbtn" id="nw-m">−</button><span class="cv" id="vnw">0</span><button class="cbtn" id="nw-p">＋</button>
+            <span class="cu">日</span><span class="cp" id="pnw"></span>
           </div>
           <div class="pr">
             <span class="prl">点滴</span>
@@ -473,12 +473,13 @@
       <div class="ts"><span>小計（税抜）</span><span id="sub">¥0</span></div>
       <div class="ts"><span>消費税（10%）</span><span id="tax">¥0</span></div>
       <div class="tm"><span class="tl">合計（税込概算）</span><span class="tv" id="tot">¥0</span></div>
+      <button id="copyBtn" style="width:100%;margin-top:14px;padding:11px 0;font-size:14px;font-weight:600;background:#2E6B1F;color:#fff;border:none;border-radius:6px;cursor:pointer;font-family:inherit">カルテ用テキストをコピー</button>
     </div>
   </div>
 </div>
 
 <script>
-var ST={species:'inu',proc:'shika',ane:'zenshin',xc:0,xa:0,lc:0,et:0,e1:0,e2:0,e3:0,f1:0,f2:0,f3:0,scSev:'n',nyuinDays:0,t1:0,t2:0,t3:0,sb1:0,sb2:0,sb3:0,ls5:0,ls10:0,ls15:0,pbx:0};
+var ST={species:'inu',proc:'shika',ane:'zenshin',xc:0,xa:0,lc:0,et:0,e1:0,e2:0,e3:0,f1:0,f2:0,f3:0,scSev:'n',nyuinDays:0,t1:0,t2:0,t3:0,sb1:0,sb2:0,sb3:0,ls5:0,ls10:0,ls15:0,pbx:0,na:0,nb:0,nc:0,nw:0};
 var fmt=function(n){return Math.round(n).toLocaleString('ja-JP');};
 var xFee=function(n){return n>0?4500+(n-1)*1500:0;};
 var lFee=function(n){return n>0?2000+(n-1)*600:0;};
@@ -532,7 +533,7 @@ function update(){
   if(ST.xa>0) rows.push({cat:'検査',name:'腹部レントゲン（'+ST.xa+'枚）',amount:xFee(ST.xa)});
 
   // 体表腫瘤
-  if(ST.proc==='hyoumen'){
+  {
     if(ST.t1>0){rows.push({cat:'手術',name:'皮膚腫瘤切除（1〜3糸）×'+ST.t1,amount:13000+(ST.t1-1)*6000});if(ST.sb1>0) rows.push({cat:'手術',name:'皮下組織縫合（1〜3糸）×'+ST.sb1,amount:3000*ST.sb1});}
     if(ST.t2>0){rows.push({cat:'手術',name:'皮膚腫瘤切除（4〜6糸）×'+ST.t2,amount:16000+(ST.t2-1)*10000});if(ST.sb2>0) rows.push({cat:'手術',name:'皮下組織縫合（4〜6糸）×'+ST.sb2,amount:3000*ST.sb2});}
     if(ST.t3>0){rows.push({cat:'手術',name:'皮膚腫瘤切除（7〜10糸）×'+ST.t3,amount:20000+(ST.t3-1)*15000});if(ST.sb3>0) rows.push({cat:'手術',name:'皮下組織縫合（7〜10糸）×'+ST.sb3,amount:3000*ST.sb3});}
@@ -542,7 +543,8 @@ function update(){
     if(ST.ls10>0) rows.push({cat:'手術',name:'レーザー蒸散 <10mm（'+ST.ls10+'箇所）',amount:2800*ST.ls10});
     if(ST.ls15>0) rows.push({cat:'手術',name:'レーザー蒸散 <15mm（'+ST.ls15+'箇所）',amount:3500*ST.ls15});
   }
-  if(ST.proc==='shika'){
+  // 歯科
+  {
     if(sc&&w>0) rows.push({cat:'手術',name:'歯石除去（スケーリング）',amount:scFee(ST.species,w,ST.scSev)});
     if(ST.e1>0) rows.push({cat:'手術',name:'抜歯 簡単（'+ST.e1+'本）',amount:1000*ST.e1});
     if(ST.f1>0) rows.push({cat:'手術',name:'フラップ作成 簡単（'+ST.f1+'箇所）',amount:1500*ST.f1});
@@ -550,7 +552,9 @@ function update(){
     if(ST.f2>0) rows.push({cat:'手術',name:'フラップ作成 2根（'+ST.f2+'箇所）',amount:3500*ST.f2});
     if(ST.e3>0) rows.push({cat:'手術',name:'抜歯 3根分割（'+ST.e3+'本）',amount:8000*ST.e3});
     if(ST.f3>0) rows.push({cat:'手術',name:'フラップ作成 3根（'+ST.f3+'箇所）',amount:4000*ST.f3});
-  }else{
+  }
+  // その他
+  {
     var sf=parseInt(document.getElementById('surgP').value)||0;
     if(sf>0) rows.push({cat:'手術',name:'手術料',amount:sf});
   }
@@ -579,10 +583,10 @@ function update(){
   if(document.getElementById('aneOther')&&document.getElementById('aneOther').checked){var aop=parseInt(document.getElementById('aneOtherP').value)||0;var aonm=document.getElementById('aneOtherNm').value||'その他';if(aop>0)rows.push({cat:'麻酔',name:aonm,amount:aop});}
   // 入院費
   if(ST.nyuinDays>0){var nfr=nyuinFeePerNight(ST.species,parseFloat(document.getElementById('weight').value)||0);rows.push({cat:'入院費',name:'入院費（'+ST.nyuinDays+'泊）',amount:nfr*ST.nyuinDays});}
-  if(document.getElementById('rxNurseA')&&document.getElementById('rxNurseA').checked&&ST.nyuinDays>0) rows.push({cat:'入院費',name:'入院看護A（'+ST.nyuinDays+'泊）',amount:2500*ST.nyuinDays});
-  if(document.getElementById('rxNurse').checked&&ST.nyuinDays>0) rows.push({cat:'入院費',name:'入院看護B（'+ST.nyuinDays+'泊）',amount:5000*ST.nyuinDays});
-  if(document.getElementById('rxNurseC')&&document.getElementById('rxNurseC').checked&&ST.nyuinDays>0) rows.push({cat:'入院費',name:'入院看護C（'+ST.nyuinDays+'泊）',amount:7500*ST.nyuinDays});
-  if(document.getElementById('rxWild')&&document.getElementById('rxWild').checked&&ST.nyuinDays>0) rows.push({cat:'入院費',name:'Wild料金（'+ST.nyuinDays+'泊）',amount:2000*ST.nyuinDays});
+  if(ST.na>0) rows.push({cat:'入院費',name:'入院看護A（'+ST.na+'日）',amount:2500*ST.na});
+  if(ST.nb>0) rows.push({cat:'入院費',name:'入院看護B（'+ST.nb+'日）',amount:5000*ST.nb});
+  if(ST.nc>0) rows.push({cat:'入院費',name:'入院看護C（'+ST.nc+'日）',amount:7500*ST.nc});
+  if(ST.nw>0) rows.push({cat:'入院費',name:'Wild料金（'+ST.nw+'日）',amount:2000*ST.nw});
   var tf=parseInt(document.getElementById('tentekiFeeInput')&&document.getElementById('tentekiFeeInput').value)||0;
   if(tf>0) rows.push({cat:'入院費',name:'点滴',amount:tf});
   var cf=parseInt(document.getElementById('chushaFeeInput')&&document.getElementById('chushaFeeInput').value)||0;
@@ -605,6 +609,21 @@ function update(){
   document.getElementById('sub').textContent='¥'+fmt(sub);
   document.getElementById('tax').textContent='¥'+fmt(tax);
   document.getElementById('tot').textContent='¥'+fmt(tot);
+
+  // カルテ用テキスト生成
+  var lines=[];
+  var spLabel=ST.species==='neko'?'猫':'犬';
+  lines.push('【手術費用概算】');
+  lines.push(spLabel+' '+(w||'-')+'kg');
+  Object.keys(grouped).forEach(function(cat){
+    lines.push('■'+cat);
+    grouped[cat].forEach(function(r){lines.push('　'+r.name+'　¥'+fmt(r.amount));});
+  });
+  lines.push('────────────');
+  lines.push('小計（税抜）¥'+fmt(sub));
+  lines.push('消費税（10%）¥'+fmt(tax));
+  lines.push('合計（税込）¥'+fmt(tot));
+  window._karteText=lines.join('\n');
 }
 
 function makeCounter(mId,pId,vId,cpId,key,feeFn,noteId){
@@ -627,9 +646,6 @@ function makeCounter(mId,pId,vId,cpId,key,feeFn,noteId){
 document.addEventListener('DOMContentLoaded',function(){
   document.getElementById('btn-inu').addEventListener('click',function(){ST.species='inu';setActive(['btn-inu','btn-neko'],'btn-inu');update();});
   document.getElementById('btn-neko').addEventListener('click',function(){ST.species='neko';setActive(['btn-inu','btn-neko'],'btn-neko');update();});
-  document.getElementById('btn-shika').addEventListener('click',function(){ST.proc='shika';setActive(['btn-shika','btn-hyoumen','btn-other'],'btn-shika');document.getElementById('pd').style.display='';document.getElementById('ph').style.display='none';document.getElementById('po').style.display='none';update();});
-  document.getElementById('btn-hyoumen').addEventListener('click',function(){ST.proc='hyoumen';setActive(['btn-shika','btn-hyoumen','btn-other'],'btn-hyoumen');document.getElementById('pd').style.display='none';document.getElementById('ph').style.display='';document.getElementById('po').style.display='none';update();});
-  document.getElementById('btn-other').addEventListener('click',function(){ST.proc='other';setActive(['btn-shika','btn-hyoumen','btn-other'],'btn-other');document.getElementById('pd').style.display='none';document.getElementById('ph').style.display='none';document.getElementById('po').style.display='';update();});
   function updateAneDisplay(){
     var senior=document.getElementById('isSenior').checked;
     document.getElementById('aneBaseNote').textContent=senior?'10歳以上':'10歳未満';
@@ -734,10 +750,33 @@ document.addEventListener('DOMContentLoaded',function(){
     document.getElementById('pnd').textContent='¥'+fmt(nyuinFeePerNight(ST.species,w)*ST.nyuinDays);
     update();
   });
+  function nurseCounter(mId,pId,vId,cpId,key,unit){
+    document.getElementById(mId).addEventListener('click',function(){ST[key]=Math.max(0,ST[key]-1);document.getElementById(vId).textContent=ST[key];document.getElementById(cpId).textContent=ST[key]>0?'¥'+fmt(unit*ST[key]):'';update();});
+    document.getElementById(pId).addEventListener('click',function(){ST[key]+=1;document.getElementById(vId).textContent=ST[key];document.getElementById(cpId).textContent='¥'+fmt(unit*ST[key]);update();});
+  }
+  nurseCounter('na-m','na-p','vna','pna','na',2500);
+  nurseCounter('nb-m','nb-p','vnb','pnb','nb',5000);
+  nurseCounter('nc-m','nc-p','vnc','pnc','nc',7500);
+  nurseCounter('nw-m','nw-p','vnw','pnw','nw',2000);
 
   document.querySelectorAll('input').forEach(function(el){
     el.addEventListener('change',update);
     el.addEventListener('input',update);
+  });
+
+  document.getElementById('copyBtn').addEventListener('click',function(){
+    var txt=window._karteText||'';
+    var btn=this;
+    function done(){btn.textContent='コピーしました ✓';setTimeout(function(){btn.textContent='カルテ用テキストをコピー';},1500);}
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(done).catch(function(){fallback();});
+    } else { fallback(); }
+    function fallback(){
+      var ta=document.createElement('textarea');ta.value=txt;ta.style.position='fixed';ta.style.opacity='0';
+      document.body.appendChild(ta);ta.focus();ta.select();
+      try{document.execCommand('copy');done();}catch(e){alert('コピーに失敗しました');}
+      document.body.removeChild(ta);
+    }
   });
 
   update();
