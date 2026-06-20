@@ -124,7 +124,7 @@
         <div class="ch">検査</div>
         <div class="cb">
           <div class="row"><input type="checkbox" id="eCBC" checked><span class="rl">CBC</span><span class="rp">¥2,000</span></div>
-          <div class="row"><input type="checkbox" id="eBioc" checked><span class="rl">生化学（スクリーニング・電解質込み）</span><span class="rp">¥5,950</span></div>
+          <div class="row"><input type="checkbox" id="eBioc" checked><span class="rl">生化学（スクリーニング・電解質込み）</span><span class="rp">¥6,600</span></div>
           <div class="bsub">
             <input type="checkbox" id="eBiocAdd" style="width:15px;height:15px">
             <span style="font-size:12px;color:#6b7280;flex:1">追加項目</span>
@@ -529,7 +529,7 @@ function update(){
 
   var rows=[];
   if(document.getElementById('eCBC').checked) rows.push({cat:'検査',name:'CBC',amount:2000});
-  if(document.getElementById('eBioc').checked) rows.push({cat:'検査',name:'生化学（スクリーニング・電解質込み）',amount:5950});
+  if(document.getElementById('eBioc').checked) rows.push({cat:'検査',name:'生化学（スクリーニング・電解質込み）',amount:6600});
   if(document.getElementById('eBiocAdd').checked){var bp=parseInt(document.getElementById('biocAddP').value)||0;if(bp>0)rows.push({cat:'検査',name:'生化学（追加項目）',amount:bp});}
   if(document.getElementById('eCoag').checked) rows.push({cat:'検査',name:'凝固検査',amount:3500});
   if(document.getElementById('eAUS').checked) rows.push({cat:'検査',name:'腹部超音波検査',amount:12500});
